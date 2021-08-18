@@ -22,6 +22,7 @@ jobs:
           name: run lint
           command: |
               sudo hadolint Dockerfile
+              sudo yarn test
     
 build-image:
     docker:
