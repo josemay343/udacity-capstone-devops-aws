@@ -5,7 +5,7 @@ jobs:
     # Use the same Docker base as the project
     - image: cimg/node:12.22.4
 
-    working_directory: ~/app
+    # working_directory: ~/app
 
     steps:
       - checkout
@@ -17,12 +17,18 @@ jobs:
               # Install hadolint
               sudo wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
               sudo chmod +x /bin/hadolint
+              sudo yarn test
 
       - run:
           name: run lint
           command: |
               sudo hadolint Dockerfile
               sudo yarn test
+      
+      - save_cache:
+          paths:
+            - ~/app
+          key: build-cache
     
 build-image:
     docker:
