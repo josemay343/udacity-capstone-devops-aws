@@ -114,14 +114,15 @@ workflows:
       - build-push-docker-image:
           requires: 
             - build-lint
-      - create-cluster:
-          cluster-name: capstone-eks-app
-          requires:
-            - build-push-docker-image
+      # - create-cluster:
+      #     cluster-name: capstone-eks-app
+      #     requires:
+      #       - build-push-docker-image
       - test-cluster:
           cluster-name: capstone-eks-app
           requires:
-            - create-cluster
+            # - create-cluster
+             - build-push-docker-image
       - create-deployment:
           cluster-name: capstone-eks-app
           requires:
