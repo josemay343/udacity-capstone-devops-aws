@@ -79,7 +79,7 @@ jobs:
     parameters:
       cluster-name:
         description: |
-          Capstone Devops Cluster
+          Name of the EKS cluster
         type: string
     steps:
       - checkout
@@ -88,8 +88,8 @@ jobs:
           install-kubectl: true
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
-          resource-file-path: tests/nginx-deployment/deployment.yaml
-          resource-name: deployment/nginx-deployment
+          resource-file-path: deployment.json
+          resource-name: deployment/capstone-app
 
 workflows:
   default:
@@ -99,14 +99,28 @@ workflows:
           requires: 
             - build-lint
       - aws-eks/create-cluster:
-          cluster-name: my-eks-demo
+          cluster-name: capstone-eks-app
+          node-max: 2
+          node-type: t2.small
           requires:
             - build-push-docker-image
       - test-cluster:
-          cluster-name: my-eks-demo
+          cluster-name: capstone-eks-app
           requires:
             - aws-eks/create-cluster
-      - aws-eks/delete-cluster:
-          cluster-name: my-eks-demo
+      - create-deployment:
+          cluster-name: capstone-eks-app
           requires:
             - test-cluster
+      - aws-eks/update-container-image:
+          cluster-name: capstone-eks-app
+          container-image-updates: 'capstone=josemay343/capstone-app:commit-${CIRCLE_SHA1:0:7}'
+          record: true
+          requires:
+            - create-deployment
+          resource-name: deployment/capstone-app
+
+      # - aws-eks/delete-cluster:
+      #     cluster-name: my-eks-demo
+      #     requires:
+      #       - test-cluster
