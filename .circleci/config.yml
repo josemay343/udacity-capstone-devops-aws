@@ -110,10 +110,10 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-lint
-      - build-push-docker-image:
-          requires: 
-            - build-lint
+      # - build-lint
+      # - build-push-docker-image:
+      #     requires: 
+      #       - build-lint
       # - create-cluster:
       #     cluster-name: capstone-eks-app
       #     requires:
@@ -123,19 +123,19 @@ workflows:
           requires:
             # - create-cluster
              - build-push-docker-image
-      - create-deployment:
+      # - create-deployment:
+      #     cluster-name: capstone-eks-app
+      #     requires:
+      #       - test-cluster
+      # - aws-eks/update-container-image:
+      #     cluster-name: capstone-eks-app
+      #     container-image-updates: 'capstone=josemay343/capstone-app:commit-${CIRCLE_SHA1:0:7}'
+      #     record: true
+      #     requires:
+      #       - create-deployment
+      #     resource-name: deployment/capstone-app
+
+      - aws-eks/delete-cluster:
           cluster-name: capstone-eks-app
           requires:
             - test-cluster
-      - aws-eks/update-container-image:
-          cluster-name: capstone-eks-app
-          container-image-updates: 'capstone=josemay343/capstone-app:commit-${CIRCLE_SHA1:0:7}'
-          record: true
-          requires:
-            - create-deployment
-          resource-name: deployment/capstone-app
-
-      # - aws-eks/delete-cluster:
-      #     cluster-name: my-eks-demo
-      #     requires:
-      #       - test-cluster
