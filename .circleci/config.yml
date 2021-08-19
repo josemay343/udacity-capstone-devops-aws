@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  build_lint:
+  build-lint:
     docker:
     # Use the same Docker base as the project
     - image: cimg/node:12.22.4
