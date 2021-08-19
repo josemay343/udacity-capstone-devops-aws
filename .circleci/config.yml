@@ -45,11 +45,13 @@ jobs:
 
         - run:
             name: set up image tag
-            command: echo "export TAG=circleci-build-${CIRCLE_BUILD_NUM}" >> $BASH_ENV
+            command: echo "export TAG=circleci-commit-${CIRCLE_SHA1}" >> $BASH_ENV
         - run:
             name: create docker image and push to dockerhub
             command: |
               docker build -t capstone-app:$TAG .
+              echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+              docker push $DOCKER_USER/capstone-app:$TAG
 
   
 
