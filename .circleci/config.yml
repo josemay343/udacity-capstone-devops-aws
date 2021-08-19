@@ -103,7 +103,7 @@ jobs:
           cluster-name: << parameters.cluster-name >>
           install-kubectl: true
       - kubernetes/create-or-update-resource:
-          get-rollout-status: true
+          # get-rollout-status: true
           resource-file-path: deployment.json
           resource-name: deployment/capstone-app
 
