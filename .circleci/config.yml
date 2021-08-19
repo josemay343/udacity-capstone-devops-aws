@@ -130,29 +130,29 @@ workflows:
       - build-push-docker-image:
           requires: 
             - build-lint
-      - create-cluster:
-          cluster-name: capstone-eks-app
-          requires:
-            - build-push-docker-image
+      # - create-cluster:
+      #     cluster-name: capstone-eks-app
+      #     requires:
+      #       - build-push-docker-image
       - test-cluster:
           cluster-name: capstone-eks-app
-          requires:
-            - create-cluster
+          # requires:
+          #   - create-cluster
           #    - build-push-docker-image
-      - create-service:
-          cluster-name: capstone-eks-app
-          requires:
-            - test-cluster
-      - create-deployment:
-          cluster-name: capstone-eks-app
-          requires:
-            - test-cluster
+      # - create-service:
+      #     cluster-name: capstone-eks-app
+      #     requires:
+      #       - test-cluster
+      # - create-deployment:
+      #     cluster-name: capstone-eks-app
+      #     requires:
+      #       - create-service
       - aws-eks/update-container-image:
           cluster-name: capstone-eks-app
           container-image-updates: 'capstone=josemay343/capstone-app:commit-${CIRCLE_SHA1:0:7}'
           record: true
-          requires:
-            - create-deployment
+          # requires:
+          #   - create-deployment
           resource-name: deployment/capstone-app
 
       # - aws-eks/delete-cluster:
