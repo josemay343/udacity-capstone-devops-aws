@@ -9,15 +9,11 @@ jobs:
     # Use the same Docker base as the project
     - image: cimg/node:12.22.4
 
-    # working_directory: ~/app
-
     steps:
       - checkout
-
       - run:
           name: install dependencies
           command: |
-
               sudo yarn install --production
               sudo yarn upgrade
               # Install hadolint
@@ -37,19 +33,13 @@ jobs:
     
   build-push-docker-image:
       docker:
-      # Use the same Docker base as the project
       - image: circleci/golang:1.15
-
-      # working_directory: ~/app
 
       steps:
         - checkout
         - setup_remote_docker:
             version: 19.03.13
 
-        - run:
-            name: set up image tag
-            command: echo "export TAG=circleci-commit-${CIRCLE_SHA1}" >> $BASH_ENV
         - run:
             name: create docker image and push to dockerhub
             command: |
@@ -130,32 +120,29 @@ workflows:
       - build-push-docker-image:
           requires: 
             - build-lint
-      # - create-cluster:
-      #     cluster-name: capstone-eks-app
-      #     requires:
-      #       - build-push-docker-image
+      - create-cluster:
+          cluster-name: capstone-eks-app
+          requires:
+            - build-push-docker-image
       - test-cluster:
           cluster-name: capstone-eks-app
           requires:
-          #   - create-cluster
-             - build-push-docker-image
-      # - create-service:
-      #     cluster-name: capstone-eks-app
-      #     requires:
-      #       - test-cluster
-      # - create-deployment:
-      #     cluster-name: capstone-eks-app
-      #     requires:
-      #       - create-service
+            - create-cluster
+      - create-service:
+          cluster-name: capstone-eks-app
+          requires:
+            - test-cluster
+      - create-deployment:
+          cluster-name: capstone-eks-app
+          requires:
+            - create-service
       - aws-eks/update-container-image:
           cluster-name: capstone-eks-app
           container-image-updates: 'capstone=josemay343/capstone-app:commit-${CIRCLE_SHA1:0:7}'
           record: true
-          # requires:
-          #   - create-deployment
-          resource-name: deployment/capstone-app
           requires:
-            - test-cluster
+            - create-deployment
+          resource-name: deployment/capstone-app
 
       # - aws-eks/delete-cluster:
       #     cluster-name: capstone-eks-app
