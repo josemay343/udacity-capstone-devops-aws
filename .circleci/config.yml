@@ -31,25 +31,25 @@ jobs:
             - ~/app
           key: build-cache
     
-build-docker-image:
-    docker:
-    # Use the same Docker base as the project
-    - image: cimg/node:12.22.4
+  build-docker-image:
+      docker:
+      # Use the same Docker base as the project
+      - image: cimg/node:12.22.4
 
-    # working_directory: ~/app
+      # working_directory: ~/app
 
-    steps:
-      - checkout
-      - setup_remote_docker:
-          version: 19.03.13
+      steps:
+        - checkout
+        - setup_remote_docker:
+            version: 19.03.13
 
-      - run:
-          name: set up image tag
-          command: echo "export TAG=circleci-${CIRCLE_WORKFLOW_ID:0:7}" >> $BASH_ENV
-      - run:
-          name: create docker image
-          command: |
-            docker build -t capstone-app:$TAG .
+        - run:
+            name: set up image tag
+            command: echo "export TAG=circleci-${CIRCLE_WORKFLOW_ID:0:7}" >> $BASH_ENV
+        - run:
+            name: create docker image
+            command: |
+              docker build -t capstone-app:$TAG .
 
 workflows:
   default:
