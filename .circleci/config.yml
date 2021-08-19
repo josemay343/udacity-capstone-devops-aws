@@ -136,9 +136,9 @@ workflows:
       #       - build-push-docker-image
       - test-cluster:
           cluster-name: capstone-eks-app
-          # requires:
+          requires:
           #   - create-cluster
-          #    - build-push-docker-image
+             - build-push-docker-image
       # - create-service:
       #     cluster-name: capstone-eks-app
       #     requires:
