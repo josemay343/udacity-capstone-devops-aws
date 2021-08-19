@@ -154,6 +154,8 @@ workflows:
           # requires:
           #   - create-deployment
           resource-name: deployment/capstone-app
+          requires:
+            - test-cluster
 
       # - aws-eks/delete-cluster:
       #     cluster-name: capstone-eks-app
