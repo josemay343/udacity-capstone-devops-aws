@@ -100,8 +100,8 @@ workflows:
             - build-lint
       - aws-eks/create-cluster:
           cluster-name: capstone-eks-app
-          node-max: 2
           node-type: t2.small
+          nodes-max: 2
           requires:
             - build-push-docker-image
       - test-cluster:
