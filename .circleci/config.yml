@@ -31,7 +31,7 @@ jobs:
             - ~/app
           key: build-cache
     
-  build-docker-image:
+  build-push-docker-image:
       docker:
       # Use the same Docker base as the project
       - image: cimg/node:12.22.4
@@ -45,15 +45,17 @@ jobs:
 
         - run:
             name: set up image tag
-            command: echo "export TAG=circleci-${CIRCLE_WORKFLOW_ID:0:7}" >> $BASH_ENV
+            command: echo "export TAG=circleci-build-${CIRCLE_BUILD_NUM}" >> $BASH_ENV
         - run:
-            name: create docker image
+            name: create docker image and push to dockerhub
             command: |
               docker build -t capstone-app:$TAG .
+
+  
 
 workflows:
   default:
     jobs:
       - build-lint
-      - build-docker-image:
+      - build-push-docker-image:
           requires: [build-lint]
