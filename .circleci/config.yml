@@ -34,7 +34,7 @@ jobs:
   build-push-docker-image:
       docker:
       # Use the same Docker base as the project
-      - image: cimg/node:12.22.4
+      - image: circleci/golang:1.15
 
       # working_directory: ~/app
 
