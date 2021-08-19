@@ -90,6 +90,22 @@ jobs:
             kubectl get services
           name: Test cluster
 
+  create-service:
+    executor: aws-eks/python3
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - checkout
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: << parameters.cluster-name >>
+          install-kubectl: true
+      - kubernetes/create-or-update-resource:
+          resource-file-path: service.json
+          resource-name: service/capstone-applb
+
   create-deployment:
     executor: aws-eks/python3
     parameters:
@@ -110,32 +126,36 @@ jobs:
 workflows:
   default:
     jobs:
-      # - build-lint
-      # - build-push-docker-image:
-      #     requires: 
-      #       - build-lint
-      # - create-cluster:
-      #     cluster-name: capstone-eks-app
-      #     requires:
-      #       - build-push-docker-image
+      - build-lint
+      - build-push-docker-image:
+          requires: 
+            - build-lint
+      - create-cluster:
+          cluster-name: capstone-eks-app
+          requires:
+            - build-push-docker-image
       - test-cluster:
           cluster-name: capstone-eks-app
-          # requires:
-          #   # - create-cluster
+          requires:
+            - create-cluster
           #    - build-push-docker-image
-      # - create-deployment:
-      #     cluster-name: capstone-eks-app
-      #     requires:
-      #       - test-cluster
-      # - aws-eks/update-container-image:
-      #     cluster-name: capstone-eks-app
-      #     container-image-updates: 'capstone=josemay343/capstone-app:commit-${CIRCLE_SHA1:0:7}'
-      #     record: true
-      #     requires:
-      #       - create-deployment
-      #     resource-name: deployment/capstone-app
-
-      - aws-eks/delete-cluster:
+      - create-service:
           cluster-name: capstone-eks-app
           requires:
             - test-cluster
+      - create-deployment:
+          cluster-name: capstone-eks-app
+          requires:
+            - test-cluster
+      - aws-eks/update-container-image:
+          cluster-name: capstone-eks-app
+          container-image-updates: 'capstone=josemay343/capstone-app:commit-${CIRCLE_SHA1:0:7}'
+          record: true
+          requires:
+            - create-deployment
+          resource-name: deployment/capstone-app
+
+      # - aws-eks/delete-cluster:
+      #     cluster-name: capstone-eks-app
+      #     requires:
+      #       - test-cluster
