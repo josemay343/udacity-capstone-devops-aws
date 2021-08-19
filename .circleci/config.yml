@@ -58,6 +58,22 @@ jobs:
               echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
               docker push $DOCKER_USER/capstone-app:$TAG
 
+  create-cluster:
+    executor: aws-eks/python3
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - checkout
+      - aws-eks/install-aws-iam-authenticator:
+          release-tag: ''
+      - aws-eks/create-cluster:
+          cluster-name: << parameters.cluster-name >>
+          node-type: t2.small
+          nodes-max: 2
+          
   test-cluster:
     executor: aws-eks/python3
     parameters:
@@ -98,10 +114,8 @@ workflows:
       - build-push-docker-image:
           requires: 
             - build-lint
-      - aws-eks/create-cluster:
+      - create-cluster:
           cluster-name: capstone-eks-app
-          node-type: t2.small
-          nodes-max: 2
           requires:
             - build-push-docker-image
       - test-cluster:
